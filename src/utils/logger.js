@@ -3,8 +3,10 @@ const { EmbedBuilder, ChannelType } = require('discord.js');
 async function sendLog(guild, embed) {
     // 1. Try to fetch by hardcoded ID from .env
     let logChannel = null;
-    if (process.env.LOG_CHANNEL_ID) {
-        logChannel = guild.channels.cache.get(process.env.LOG_CHANNEL_ID);
+    const targetId = process.env.LOG_CHANNEL_ID || '1525124336640327750';
+    
+    if (targetId) {
+        logChannel = guild.channels.cache.get(targetId);
     }
     
     // 2. Fallback to name search if ID is missing or channel not found
