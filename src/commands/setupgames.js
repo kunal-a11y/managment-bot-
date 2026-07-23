@@ -5,7 +5,7 @@ const axios = require('axios');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('setupgames')
-        .setDescription('Setup an auto-poster for REAL free PC games.')
+        .setDescription('Setup an auto-poster for REAL free PC games every 5 minutes.')
         .addChannelOption(option =>
             option.setName('channel')
                 .setDescription('The channel to send free games to')
@@ -25,14 +25,14 @@ module.exports = {
         // Send a game immediately for demonstration
         await sendRealGameSuggestion(channel);
 
-        // Schedule to run every 15 minutes: */15 * * * *
-        const task = cron.schedule('*/15 * * * *', async () => {
+        // Schedule to run every 5 minutes: */5 * * * *
+        const task = cron.schedule('*/5 * * * *', async () => {
             await sendRealGameSuggestion(channel);
         });
 
         interaction.client.gamesIntervals.set(guildId, task);
 
-        await interaction.editReply({ content: `✅ Successfully set up REAL free game suggestions every 15 minutes in ${channel}! (A sample has been sent now)` });
+        await interaction.editReply({ content: `✅ Successfully set up REAL free game suggestions every 5 minutes in ${channel}! (A sample has been sent now)` });
     },
 };
 
