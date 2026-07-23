@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const cron = require('node-cron');
 const axios = require('axios');
 
@@ -12,6 +12,8 @@ module.exports = {
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
     async execute(interaction) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const channel = interaction.options.getChannel('channel');
         const guildId = interaction.guild.id;
 
@@ -30,7 +32,7 @@ module.exports = {
 
         interaction.client.gamesIntervals.set(guildId, task);
 
-        await interaction.reply({ content: `✅ Successfully set up REAL free game suggestions every 15 minutes in ${channel}! (A sample has been sent now)`, ephemeral: true });
+        await interaction.editReply({ content: `✅ Successfully set up REAL free game suggestions every 15 minutes in ${channel}! (A sample has been sent now)` });
     },
 };
 
@@ -41,7 +43,8 @@ async function sendRealGameSuggestion(channel) {
             params: {
                 platform: 'pc',
                 sort_by: 'popularity'
-            }
+            },
+            timeout: 10000 // 10 second timeout
         });
 
         const games = response.data;
@@ -75,6 +78,6 @@ async function sendRealGameSuggestion(channel) {
         await channel.send({ embeds: [embed], components: [row] });
 
     } catch (error) {
-        console.error('Error fetching real free game suggestion:', error);
+        console.error(`Error fetching real free game suggestion for channel ${channel.id}:`, error.message);
     }
 }

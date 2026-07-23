@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const cron = require('node-cron');
 const axios = require('axios');
 
@@ -23,11 +23,14 @@ module.exports = {
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
     async execute(interaction) {
+        // Acknowledge interaction immediately to prevent timeout errors
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const channel = interaction.options.getChannel('channel');
         const guildId = interaction.guild.id;
 
         if (!TMDB_API_KEY) {
-            return interaction.reply({ content: 'TMDB API Key is missing in the .env file!', ephemeral: true });
+            return interaction.editReply({ content: 'TMDB API Key is missing in the .env file!' });
         }
 
         if (interaction.client.moviesIntervals.has(guildId)) {
@@ -45,7 +48,7 @@ module.exports = {
 
         interaction.client.moviesIntervals.set(guildId, task);
 
-        await interaction.reply({ content: `✅ Successfully set up Themed Movie suggestions every 15 minutes in ${channel}! (A sample has been sent now)`, ephemeral: true });
+        await interaction.editReply({ content: `✅ Successfully set up Themed Movie suggestions every 15 minutes in ${channel}! (A sample has been sent now)` });
     },
 };
 
@@ -73,7 +76,7 @@ async function sendRealMovieSuggestion(channel) {
             if (theme.region) params.region = theme.region;
         }
 
-        const response = await axios.get(url, { params });
+        const response = await axios.get(url, { params, timeout: 10000 }); // Added 10s timeout
         const movies = response.data.results;
         
         if (!movies || movies.length === 0) return;
@@ -106,6 +109,6 @@ async function sendRealMovieSuggestion(channel) {
 
         await channel.send({ embeds: [embed], components: [row] });
     } catch (error) {
-        console.error('Error fetching real movie suggestion:', error);
+        console.error(`Error fetching real movie suggestion for channel ${channel.id}:`, error.message);
     }
 }

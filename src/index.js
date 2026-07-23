@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection, Partials, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Partials, ActivityType, Events, MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -47,12 +47,12 @@ if (fs.existsSync(eventsPath)) {
     }
 }
 
-client.once('ready', () => {
+client.once(Events.ClientReady, () => {
     console.log(`Ready! Logged in as ${client.user.tag}`);
     client.user.setActivity('Managing the Server', { type: ActivityType.Watching });
 });
 
-client.on('interactionCreate', async interaction => {
+client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = interaction.client.commands.get(interaction.commandName);
@@ -65,11 +65,13 @@ client.on('interactionCreate', async interaction => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
+        console.error(`Error executing ${interaction.commandName}:`, error);
+        
+        // Handle Unknown Interaction / Already replied errors gracefully
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+            await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral }).catch(e => console.error('Failed to followUp error:', e));
         } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral }).catch(e => console.error('Failed to reply error:', e));
         }
     }
 });

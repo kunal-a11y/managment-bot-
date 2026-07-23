@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,15 +14,17 @@ module.exports = {
                 .setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages), // Admin/Mod only
     async execute(interaction) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        
         const message = interaction.options.getString('message');
         const channel = interaction.options.getChannel('channel') || interaction.channel;
 
         try {
             await channel.send(message);
-            await interaction.reply({ content: `Message sent successfully to ${channel}.`, ephemeral: true });
+            await interaction.editReply({ content: `Message sent successfully to ${channel}.` });
         } catch (error) {
-            console.error('Error sending message:', error);
-            await interaction.reply({ content: 'Failed to send the message. Make sure I have permissions in that channel.', ephemeral: true });
+            console.error('Error sending message in say command:', error.message);
+            await interaction.editReply({ content: 'Failed to send the message. Make sure I have permissions in that channel.' });
         }
     },
 };

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,7 +13,7 @@ module.exports = {
         const enable = interaction.options.getBoolean('enable');
         const guild = interaction.guild;
 
-        await interaction.deferReply();
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         let successCount = 0;
 
@@ -31,14 +31,14 @@ module.exports = {
                     successCount++;
                 }
             } catch (err) {
-                console.error(`Failed to lock/unlock channel ${channel.name}:`, err);
+                console.error(`Failed to lock/unlock channel ${channel.name}:`, err.message);
             }
         }
 
         if (enable) {
-            await interaction.followUp(`🔒 Server is now in **LOCKDOWN**. Restricted permissions in ${successCount} channels.`);
+            await interaction.editReply(`🔒 Server is now in **LOCKDOWN**. Restricted permissions in ${successCount} channels.`);
         } else {
-            await interaction.followUp(`🔓 Server lockdown **LIFTED**. Restored permissions in ${successCount} channels.`);
+            await interaction.editReply(`🔓 Server lockdown **LIFTED**. Restored permissions in ${successCount} channels.`);
         }
     },
 };
