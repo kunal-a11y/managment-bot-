@@ -5,10 +5,10 @@ const axios = require('axios');
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 const THEMES = [
-    { name: 'Business / Finance', query: 'finance wall street business' },
+    { name: 'Action & Adventure', with_genres: '28,12' },
     { name: 'Latest Hits', type: 'latest' },
-    { name: 'Marvel / Avengers', query: 'avengers marvel' },
-    { name: 'DC Universe', query: 'batman superman justice league' },
+    { name: 'Sci-Fi Marvels', with_genres: '878' },
+    { name: 'Comedy Gold', with_genres: '35' },
     { name: 'Bollywood Blockbusters', language: 'hi', region: 'IN' },
     { name: 'Hollywood Highlights', language: 'en', region: 'US' }
 ];
@@ -62,16 +62,12 @@ module.exports = {
             page: Math.floor(Math.random() * 5) + 1 // Increased to random page 1-5 for much more variety
         };
 
-        if (theme.query) {
-            url = 'https://api.themoviedb.org/3/search/movie';
-            params.query = theme.query;
-            delete params.sort_by; // search doesn't use sort_by
-            params.page = 1; // Must be 1 to guarantee results for specific searches
-        } else if (theme.type === 'latest') {
+        if (theme.type === 'latest') {
             const date = new Date().toISOString().split('T')[0];
             params['primary_release_date.lte'] = date;
             params['release_date.lte'] = date;
         } else {
+            if (theme.with_genres) params.with_genres = theme.with_genres;
             if (theme.language) params.with_original_language = theme.language;
             if (theme.region) params.region = theme.region;
         }
