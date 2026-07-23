@@ -65,12 +65,12 @@ client.on(Events.InteractionCreate, async interaction => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(`Error executing ${interaction.commandName}:`, error);
-        
         // Handle Unknown Interaction / Already replied errors gracefully
         const ignoreCodes = [10062, 40060];
-        if (ignoreCodes.includes(error.code)) return; // Ignore expired/duplicate interactions
+        if (ignoreCodes.includes(error.code)) return; // Ignore expired/duplicate interactions entirely
 
+        console.error(`Error executing ${interaction.commandName}:`, error);
+        
         if (interaction.replied || interaction.deferred) {
             await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral }).catch(e => {
                 if (!ignoreCodes.includes(e.code)) console.error('Failed to followUp error:', e);
