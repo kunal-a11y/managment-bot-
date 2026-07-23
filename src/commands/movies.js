@@ -76,7 +76,19 @@ async function sendRealMovieSuggestion(channel) {
             if (theme.region) params.region = theme.region;
         }
 
-        const response = await axios.get(url, { params, timeout: 10000 }); // Added 10s timeout
+        let retries = 3;
+        let response;
+        while (retries > 0) {
+            try {
+                response = await axios.get(url, { params, timeout: 10000 }); // Added 10s timeout
+                break;
+            } catch (err) {
+                retries--;
+                if (retries === 0) throw err;
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retrying
+            }
+        }
+        
         const movies = response.data.results;
         
         if (!movies || movies.length === 0) return;

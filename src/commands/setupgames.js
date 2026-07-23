@@ -38,14 +38,24 @@ module.exports = {
 
 async function sendRealGameSuggestion(channel) {
     try {
-        // Fetch free games from FreeToGame API
-        const response = await axios.get('https://www.freetogame.com/api/games', {
-            params: {
-                platform: 'pc',
-                sort_by: 'popularity'
-            },
-            timeout: 10000 // 10 second timeout
-        });
+        let retries = 3;
+        let response;
+        while (retries > 0) {
+            try {
+                response = await axios.get('https://www.freetogame.com/api/games', {
+                    params: {
+                        platform: 'pc',
+                        sort_by: 'popularity'
+                    },
+                    timeout: 10000 // 10 second timeout
+                });
+                break;
+            } catch (err) {
+                retries--;
+                if (retries === 0) throw err;
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retrying
+            }
+        }
 
         const games = response.data;
         if (!games || games.length === 0) return;
