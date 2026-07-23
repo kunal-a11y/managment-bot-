@@ -64,7 +64,7 @@ async function sendRealGameSuggestion(channel) {
         const randomGame = games[Math.floor(Math.random() * Math.min(50, games.length))];
 
         const embed = new EmbedBuilder()
-            .setColor('#9B59B6') // Purple color
+            .setColor('#AC00FF') // Purple color
             .setTitle(randomGame.title)
             .setURL(randomGame.game_url)
             .setAuthor({ name: `🎮 Free on ${randomGame.platform}` })

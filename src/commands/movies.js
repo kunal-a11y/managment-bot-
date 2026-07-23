@@ -102,7 +102,7 @@ async function sendRealMovieSuggestion(channel) {
         const tmdbLink = `https://www.themoviedb.org/movie/${randomMovie.id}`;
 
         const embed = new EmbedBuilder()
-            .setColor('#9B59B6') // Purple color
+            .setColor('#AC00FF') // Purple color
             .setTitle(randomMovie.title || randomMovie.original_title)
             .setURL(tmdbLink)
             .setAuthor({ name: `🍿 Theme: ${theme.name}` })
