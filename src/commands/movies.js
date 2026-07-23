@@ -66,7 +66,7 @@ module.exports = {
             url = 'https://api.themoviedb.org/3/search/movie';
             params.query = theme.query;
             delete params.sort_by; // search doesn't use sort_by
-            params.page = Math.floor(Math.random() * 2) + 1; // Allow page 1 or 2 for searches to increase variety
+            params.page = 1; // Must be 1 to guarantee results for specific searches
         } else if (theme.type === 'latest') {
             const date = new Date().toISOString().split('T')[0];
             params['primary_release_date.lte'] = date;
