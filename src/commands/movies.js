@@ -52,21 +52,21 @@ module.exports = {
     },
 };
 
-async function sendRealMovieSuggestion(channel) {
+    async function sendRealMovieSuggestion(channel) {
     try {
         const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
         let url = 'https://api.themoviedb.org/3/discover/movie';
         let params = {
             api_key: TMDB_API_KEY,
             sort_by: 'popularity.desc',
-            page: Math.floor(Math.random() * 3) + 1 // random page 1-3
+            page: Math.floor(Math.random() * 5) + 1 // Increased to random page 1-5 for much more variety
         };
 
         if (theme.query) {
             url = 'https://api.themoviedb.org/3/search/movie';
             params.query = theme.query;
             delete params.sort_by; // search doesn't use sort_by
-            params.page = 1; // force page 1 for search queries to get best matches
+            params.page = Math.floor(Math.random() * 2) + 1; // Allow page 1 or 2 for searches to increase variety
         } else if (theme.type === 'latest') {
             const date = new Date().toISOString().split('T')[0];
             params['primary_release_date.lte'] = date;
@@ -93,7 +93,8 @@ async function sendRealMovieSuggestion(channel) {
         
         if (!movies || movies.length === 0) return;
 
-        const randomMovie = movies[Math.floor(Math.random() * Math.min(10, movies.length))];
+        // Pick a random movie from the top 20 instead of top 10
+        const randomMovie = movies[Math.floor(Math.random() * Math.min(20, movies.length))];
         
         const imageUrl = randomMovie.poster_path 
             ? `https://image.tmdb.org/t/p/w500${randomMovie.poster_path}` 
