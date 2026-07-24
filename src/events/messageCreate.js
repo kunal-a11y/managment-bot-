@@ -30,14 +30,8 @@ module.exports = {
                 setTimeout(() => warningMsg.delete().catch(() => {}), 5000);
                 
                 // Log the abuse
-                const embed = new EmbedBuilder()
-                    .setColor('#FFA500')
-                    .setTitle('Abusive Message Deleted')
-                    .setDescription(`An abusive message by ${message.author.tag} was deleted in ${message.channel}.`)
-                    .addFields({ name: 'Content', value: message.content })
-                    .setTimestamp();
-                    
-                await sendLog(message.guild, embed);
+                const contentStr = message.content.substring(0, 100);
+                enqueueLog(message.guild.id, `⚠️ **Abusive Message Deleted:** by ${message.author.tag} in ${message.channel}.\nContent: "${contentStr}"`);
                 
             } catch (error) {
                 console.error('Could not delete abusive message:', error);

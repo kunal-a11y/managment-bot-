@@ -47,9 +47,12 @@ if (fs.existsSync(eventsPath)) {
     }
 }
 
+const { startLogFlusher } = require('./utils/logger');
+
 client.once(Events.ClientReady, () => {
     console.log(`Ready! Logged in as ${client.user.tag}`);
     client.user.setActivity('Managing the Server', { type: ActivityType.Watching });
+    startLogFlusher(client);
 });
 
 client.on(Events.InteractionCreate, async interaction => {

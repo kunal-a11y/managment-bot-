@@ -1,26 +1,16 @@
-const { EmbedBuilder, ChannelType } = require('discord.js');
-const { sendLog } = require('../utils/logger');
+const { enqueueLog } = require('../utils/logger');
+const { ChannelType, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'guildMemberAdd',
     async execute(member, client) {
         const guild = member.guild;
         
-        // --- LOGGING ---
-        const embed = new EmbedBuilder()
-            .setColor('#00FF00')
-            .setTitle('Member Joined')
-            .setDescription(`${member.user.tag} has joined the server.`)
-            .setThumbnail(member.user.displayAvatarURL())
-            .setTimestamp();
-            
-        // Check if the joined member is a bot
         if (member.user.bot) {
-            embed.setTitle('Bot Joined');
-            embed.setDescription(`Bot ${member.user.tag} was added to the server.`);
+            enqueueLog(guild.id, `🤖 **Bot Joined:** ${member.user.tag} (${member.id})`);
+        } else {
+            enqueueLog(guild.id, `👋 **Member Joined:** ${member.user.tag} (${member.id})`);
         }
-
-        await sendLog(guild, embed);
 
         // --- ANTI-RAID SYSTEM (20 joins in 10 seconds) ---
         if (!member.user.bot) {
@@ -60,13 +50,7 @@ module.exports = {
                         }
                     }
 
-                    // Send alert to log channel
-                    const alertEmbed = new EmbedBuilder()
-                        .setColor('#FF0000')
-                        .setTitle('🚨 RAID DETECTED 🚨')
-                        .setDescription(`More than 20 joins in 10 seconds. Server has been locked down. Restricted ${successCount} channels.`)
-                        .setTimestamp();
-                    await sendLog(guild, alertEmbed);
+                    enqueueLog(guild.id, `🚨 **RAID DETECTED:** More than 20 joins in 10 seconds. Server locked down. Restricted ${successCount} channels.`);
                 }
             }
         }
