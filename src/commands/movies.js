@@ -69,7 +69,18 @@ async function sendRealMovieSuggestion(channel, guildId) {
         if (theme.with_genres) params.with_genres = theme.with_genres;
         if (theme.with_original_language) params.with_original_language = theme.with_original_language;
 
-        const data = await fetchWithRetry(`https://api.themoviedb.org/3/${endpoint}`, { params });
+        let data;
+        try {
+            data = await fetchWithRetry(`https://api.themoviedb.org/3/${endpoint}`, { params });
+        } catch (err) {
+            if (err.response && err.response.status === 404) {
+                params.page = 1;
+                data = await fetchWithRetry(`https://api.themoviedb.org/3/${endpoint}`, { params });
+            } else {
+                throw err;
+            }
+        }
+        
         const items = data.results;
         
         if (!items || items.length === 0) return;

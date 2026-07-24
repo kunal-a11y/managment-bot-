@@ -68,7 +68,19 @@ async function sendRealGameSuggestion(channel, guildId) {
         if (category.dates) params.dates = category.dates;
         if (category.metacritic) params.metacritic = category.metacritic;
 
-        const data = await fetchWithRetry('https://api.rawg.io/api/games', { params });
+        let data;
+        try {
+            data = await fetchWithRetry('https://api.rawg.io/api/games', { params });
+        } catch (err) {
+            if (err.response && err.response.status === 404) {
+                // If page out of bounds, fallback to page 1
+                params.page = 1;
+                data = await fetchWithRetry('https://api.rawg.io/api/games', { params });
+            } else {
+                throw err;
+            }
+        }
+        
         const games = data.results;
         if (!games || games.length === 0) return;
 
