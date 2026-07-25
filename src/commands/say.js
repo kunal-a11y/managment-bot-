@@ -7,7 +7,8 @@ module.exports = {
         .addStringOption(option =>
             option.setName('message')
                 .setDescription('The message to send')
-                .setRequired(true))
+                .setRequired(true)
+                .setMaxLength(2000))
         .addChannelOption(option =>
             option.setName('channel')
                 .setDescription('The channel to send the message to')
