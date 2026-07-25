@@ -12,8 +12,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('reason')
                 .setDescription('The reason for kicking')
-                .setRequired(false))
-        .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
+                .setRequired(false)),
     async execute(interaction) {
         if (!isAuthorized(interaction.member)) {
             return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });

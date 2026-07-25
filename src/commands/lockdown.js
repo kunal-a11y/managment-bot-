@@ -5,17 +5,16 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('lockdown')
         .setDescription('Lockdown the entire server (prevents @everyone from sending messages and joining VC).')
-        .addBooleanOption(option =>
-            option.setName('enable')
-                .setDescription('True to enable lockdown, False to lift it.')
-                .setRequired(true))
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        .addBooleanOption(option => 
+            option.setName('status')
+                .setDescription('True to lock, false to unlock')
+                .setRequired(true)),
     async execute(interaction) {
         if (!isAuthorized(interaction.member)) {
             return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
         }
 
-        const enable = interaction.options.getBoolean('enable');
+        const enable = interaction.options.getBoolean('status');
         const guild = interaction.guild;
 
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });

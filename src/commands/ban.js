@@ -12,8 +12,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('reason')
                 .setDescription('The reason for banning')
-                .setRequired(false))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+                .setRequired(false)),
     async execute(interaction) {
         if (!isAuthorized(interaction.member)) {
             return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });

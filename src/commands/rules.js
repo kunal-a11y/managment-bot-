@@ -4,8 +4,7 @@ const { isAuthorized } = require('../utils/permissions');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('rules')
-        .setDescription('Post the beautiful Nexora Server Rules.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild), // Admin/Mod only
+        .setDescription('Post the beautiful Nexora Server Rules.'),
     async execute(interaction) {
         if (!isAuthorized(interaction.member)) {
             return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });

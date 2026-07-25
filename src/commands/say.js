@@ -13,8 +13,7 @@ module.exports = {
         .addChannelOption(option =>
             option.setName('channel')
                 .setDescription('The channel to send the message to')
-                .setRequired(false))
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages), // Admin/Mod only
+                .setRequired(false)),
     async execute(interaction) {
         if (!isAuthorized(interaction.member)) {
             return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
