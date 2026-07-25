@@ -17,11 +17,13 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         
-        const message = interaction.options.getString('message');
+        const rawMessage = interaction.options.getString('message');
+        // Manually truncate to 2000 chars just in case the Discord UI allows longer inputs
+        const message = rawMessage.length > 2000 ? rawMessage.substring(0, 2000) : rawMessage;
         const channel = interaction.options.getChannel('channel') || interaction.channel;
 
         try {
-            await channel.send(message);
+            await channel.send({ content: message });
             await interaction.editReply({ content: `Message sent successfully to ${channel}.` });
         } catch (error) {
             console.error('Error sending message in say command:', error.message);
