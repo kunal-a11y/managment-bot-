@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { isAuthorized } = require('../utils/permissions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,6 +16,10 @@ module.exports = {
                 .setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages), // Admin/Mod only
     async execute(interaction) {
+        if (!isAuthorized(interaction.member)) {
+            return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
+        }
+
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         
         const rawMessage = interaction.options.getString('message');

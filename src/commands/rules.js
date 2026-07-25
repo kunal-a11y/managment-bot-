@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const { isAuthorized } = require('../utils/permissions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -6,6 +7,10 @@ module.exports = {
         .setDescription('Post the beautiful Nexora Server Rules.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild), // Admin/Mod only
     async execute(interaction) {
+        if (!isAuthorized(interaction.member)) {
+            return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
+        }
+        
         const color = '#8B5CF6'; // Nexora purple branding
         const thumbnail = interaction.guild.iconURL({ dynamic: true, size: 256 }) || null;
 

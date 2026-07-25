@@ -2,6 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder
 const cron = require('node-cron');
 const db = require('../database/db');
 const { fetchWithRetry } = require('../utils/api');
+const { isAuthorized } = require('../utils/permissions');
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
@@ -24,6 +25,10 @@ module.exports = {
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
     async execute(interaction) {
+        if (!isAuthorized(interaction.member)) {
+            return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
+        }
+
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         if (!TMDB_API_KEY) {

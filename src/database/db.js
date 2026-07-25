@@ -37,6 +37,15 @@ db.exec(`
         guild_id TEXT PRIMARY KEY,
         log_channel_id TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS warnings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        guild_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        moderator_id TEXT NOT NULL,
+        reason TEXT,
+        warned_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 `);
 
 module.exports = db;

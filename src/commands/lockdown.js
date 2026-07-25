@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags } = require('discord.js');
+const { isAuthorized } = require('../utils/permissions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,6 +11,10 @@ module.exports = {
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
+        if (!isAuthorized(interaction.member)) {
+            return interaction.reply({ content: '❌ You do not have permission to use this command.', ephemeral: true });
+        }
+
         const enable = interaction.options.getBoolean('enable');
         const guild = interaction.guild;
 
