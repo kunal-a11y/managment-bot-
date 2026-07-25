@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const db = require('../database/db');
 const { isAuthorized } = require('../utils/permissions');
+const { logIncident } = require('../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -42,8 +43,13 @@ module.exports = {
             .setColor('#FFFF00')
             .setTitle('⚠️ Member Warned')
             .setDescription(`**${targetUser.tag}** has been warned.`)
-            .addFields({ name: 'Reason', value: reason });
+            .addFields(
+                { name: 'Reason', value: reason },
+                { name: 'Moderator', value: interaction.user.tag }
+            )
+            .setTimestamp();
             
         await interaction.reply({ embeds: [embed] });
+        await logIncident(interaction.guild, embed);
     },
 };

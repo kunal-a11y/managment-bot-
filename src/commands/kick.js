@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { isAuthorized } = require('../utils/permissions');
+const { logIncident } = require('../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -37,9 +38,14 @@ module.exports = {
                 .setColor('#FF9900')
                 .setTitle('👢 Member Kicked')
                 .setDescription(`**${targetUser.tag}** has been kicked.`)
-                .addFields({ name: 'Reason', value: reason });
+                .addFields(
+                    { name: 'Reason', value: reason },
+                    { name: 'Moderator', value: interaction.user.tag }
+                )
+                .setTimestamp();
                 
             await interaction.reply({ embeds: [embed] });
+            await logIncident(interaction.guild, embed);
         } catch (error) {
             console.error('Kick error:', error);
             await interaction.reply({ content: '❌ An error occurred while trying to kick the user.', ephemeral: true });

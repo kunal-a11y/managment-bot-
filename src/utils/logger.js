@@ -83,4 +83,34 @@ function startLogFlusher(client) {
     });
 }
 
-module.exports = { enqueueLog, startLogFlusher };
+/**
+ * Sends a high-priority incident embed directly to the log channel in real-time, bypassing the batch queue.
+ * Use this for critical moderation events like Bans, Kicks, Timeouts, and Warnings.
+ */
+async function logIncident(guild, embed) {
+    if (!guild) return;
+    
+    let logChannel = null;
+    const targetId = process.env.LOG_CHANNEL_ID || '1525124336640327750';
+    
+    if (targetId) {
+        logChannel = guild.channels.cache.get(targetId) || await guild.channels.fetch(targetId).catch(() => null);
+    }
+    
+    if (!logChannel) {
+        logChannel = guild.channels.cache.find(c => 
+            c.type === ChannelType.GuildText && 
+            c.name.toLowerCase().includes('log')
+        );
+    }
+
+    if (logChannel) {
+        try {
+            await logChannel.send({ embeds: [embed] });
+        } catch (error) {
+            console.error('Failed to send real-time incident log:', error);
+        }
+    }
+}
+
+module.exports = { enqueueLog, startLogFlusher, logIncident };

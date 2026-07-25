@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { isAuthorized } = require('../utils/permissions');
+const { logIncident } = require('../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -37,9 +38,14 @@ module.exports = {
                 .setColor('#FF0000')
                 .setTitle('🔨 Member Banned')
                 .setDescription(`**${targetUser.tag}** has been banned.`)
-                .addFields({ name: 'Reason', value: reason });
+                .addFields(
+                    { name: 'Reason', value: reason },
+                    { name: 'Moderator', value: interaction.user.tag }
+                )
+                .setTimestamp();
                 
             await interaction.reply({ embeds: [embed] });
+            await logIncident(interaction.guild, embed);
         } catch (error) {
             console.error('Ban error:', error);
             await interaction.reply({ content: '❌ An error occurred while trying to ban the user.', ephemeral: true });

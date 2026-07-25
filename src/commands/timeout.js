@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { isAuthorized } = require('../utils/permissions');
+const { logIncident } = require('../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -43,9 +44,14 @@ module.exports = {
                 .setColor('#FFA500')
                 .setTitle('⏳ Member Timed Out')
                 .setDescription(`**${targetUser.tag}** has been timed out for ${durationMin} minutes.`)
-                .addFields({ name: 'Reason', value: reason });
+                .addFields(
+                    { name: 'Reason', value: reason },
+                    { name: 'Moderator', value: interaction.user.tag }
+                )
+                .setTimestamp();
                 
             await interaction.reply({ embeds: [embed] });
+            await logIncident(interaction.guild, embed);
         } catch (error) {
             console.error('Timeout error:', error);
             await interaction.reply({ content: '❌ An error occurred while trying to timeout the user.', ephemeral: true });
